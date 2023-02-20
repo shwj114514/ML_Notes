@@ -1,0 +1,70 @@
+\documentclass[12pt, a4paper, oneside]{ctexart}
+\usepackage{amsmath, amsthm, amssymb, graphicx,color}
+\usepackage[bookmarks=true, colorlinks, citecolor=blue, linkcolor=black]{hyperref}
+\usepackage{listings} % 插入代码
+\usepackage{pythonhighlight}
+\usepackage{hyperref}
+% 导言区
+\usepackage{tikz}
+
+
+\title{深度学习中的优化器}
+\author{Shwj}
+\date{\today}
+\begin{document}
+\maketitle
+
+
+
+\par
+参考资料：
+\begin{enumerate}
+    \item \href{https://www.bilibili.com/video/BV1X34y197mF}{https://www.bilibili.com/video/BV1X34y197mF} 
+    \item \href{https://www.bilibili.com/video/BV1r64y1s7fU}{王木头学科学} 
+\end{enumerate}
+
+\begin{python}
+    optimizer = optim.SGD(model.parameters(), 
+                lr=0.01, momentum=0.9)
+\end{python}
+
+\section{前言}
+
+\par 
+神经网络相当于一个函数$f$，对$f$展开有
+$$f(\boldsymbol{x}+d \boldsymbol{x}) \approx f(\boldsymbol{x})+{\nabla f(\boldsymbol{x})}^{T} \cdot d \boldsymbol{x} + \frac{1}{2} \, {d \boldsymbol{x}}^{T} \cdot H_f \cdot d \boldsymbol{x}$$
+\par
+其中$H_f$是$f$的$Hessian \, Matrix$，我们一般展开到$f$的一阶无穷小，即$$f(\boldsymbol{x}+d \boldsymbol{x}) \approx f(\boldsymbol{x})+\nabla f(\boldsymbol{x}) \cdot d \boldsymbol{x}$$
+\par
+神经网络的f难以写出显示表达式，自然无法用求导的方法求得最小值。但我们可以利用迭代的方法，使其每次迭代时函数值减小，为此取$d \boldsymbol{x} =-\eta \nabla f(\boldsymbol{x})$则有
+$$\nabla f(\boldsymbol{x}) \cdot d \boldsymbol{x} =-\eta \nabla {f(\boldsymbol{x})}^2 \leq 0$$
+\section{牛顿法}
+\par
+随机梯度下降法和标准的梯度下降法的区别我暂时蒙在鼓里，或许标准的方法是把整个样本集丢进去求梯度，而SGD是每次取一个batch做BP求梯度？
+\par
+牛顿法考虑了函数的泰勒展开的二次项，相当于在对应点拿抛物线逼近函数，它的更新公式为$$ \boldsymbol{x} = \boldsymbol{x} - {H_f(\boldsymbol{x})}^{-1} \cdot \nabla f(\boldsymbol{x})$$
+在$f(\boldsymbol{x}) = f(\boldsymbol{x_0})+{\nabla f(\boldsymbol{x_0})}^{T} \cdot (\boldsymbol{x}-\boldsymbol{x_0}) + \frac{1}{2} \, {(\boldsymbol{x}-\boldsymbol{x_0})}^{T} \cdot H_f(\boldsymbol{x_0}) \cdot (\boldsymbol{x}-\boldsymbol{x_0})$中，对$\boldsymbol{x}$求偏导，就有
+$f^{'}(\boldsymbol{x}) = {\nabla f(\boldsymbol{x_0})}^{T} + \cdot H_f(\boldsymbol{x_0}) \cdot (\boldsymbol{x}-\boldsymbol{x_0})$，令$f^{'}(\boldsymbol{x})=0$就可以得到结论。
+\par
+牛顿法相对于提前给定学习率$\eta$的梯度下降法，它能根据当前的函数值动态确定学习率，但是缺点是$H_f^{-1}(\boldsymbol{x_0})$的计算量过大
+\section{随机梯度下降(SGD)}
+\section{带动量的梯度下降法}
+$$w_t=w_{t-1}-\eta \cdot g_w$$
+$$v_t=\beta_1 \cdot v_{t-1}+(1-\beta_1)g_w$$
+$$\overline{v_t}=\frac{v_t}{1-\beta_1^t}$$
+$$w_t=w_{t-1}-\eta \cdot \overline{v_t}$$
+\par
+下面的方法都是研究梯度下降的方法。梯度虽然能给出下降最快的方向，却没给出最优的下降路径。拿每次梯度更新得到的直线路径去逼近真实的下降曲线。
+\section{均方根传递}
+$$w_t=w_{t-1}-\eta \cdot g_w$$
+$$m_t=\beta_1 \cdot m_{t-1}+(1-\beta_2)g^2$$
+$$\overline{m_t}=\frac{m_t}{1-\beta_1^t}$$
+$$w_t=w_{t-1}-\eta \cdot \frac{g_w}{\sqrt{\overline{m_t}}}$$
+\section{自适应矩估计(Adam)}
+
+$$w_t=w_{t-1}-\eta \frac{\overline{v_t}}{\sqrt{\overline{m_t}}}$$
+
+\section{ceshi}
+
+
+\end{document}
